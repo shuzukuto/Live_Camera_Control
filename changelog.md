@@ -8,6 +8,9 @@ Lịch sử thay đổi và nâng cấp của Hệ thống Giám sát & Ghi hìn
 > sửa lại giao diện
 > thay đổi cổng mặc định tránh trùng với các project, app khác
 
+### Added
+- Biên soạn tài liệu kỹ thuật toàn diện `README.md` hướng dẫn chi tiết từng tính năng, kiến trúc WebRTC go2rtc, cơ chế StreamKeeper 24/7, hướng dẫn cài đặt và khởi chạy (Windows `start.bat`, Linux `start.sh`, `docker-compose.yml`), các bước kết nối camera đám mây EZVIZ, Xiaomi Mi Home (6 server region), ONVIF/RTSP, điều khiển PTZ, ghi hình fMP4, nhật ký sự kiện AI và danh mục API.
+
 ### Changed
 - Cập nhật cổng mặc định hệ thống từ `8000` sang `8090` (`http://localhost:8090/`) tránh xung đột cổng với các dự án/ứng dụng khác (như hệ thống `Hikvision_Monitoring_System` đang dùng cổng 8000 trên máy chủ NAS); cập nhật đồng bộ trong `backend/app/config.py`, `run.py`, `start.bat`, `start.sh`, `docker-compose.yml`, `Dockerfile` và test suites.
 - Mở rộng Content Security Policy (CSP) trong `backend/app/main.py` cho phép script từ Tailwind CDN và font từ Google Fonts.
