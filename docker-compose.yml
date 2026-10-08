@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  nvr-console:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nvr-surveillance-console:latest
+    container_name: nvr_surveillance_app
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - ENV=production
+      - HOST=0.0.0.0
+      - PORT=8090
+      - GO2RTC_ENABLED=true
+      - GO2RTC_API_URL=http://127.0.0.1:1984
+      - GO2RTC_RTSP_URL=rtsp://127.0.0.1:8554
+      - GO2RTC_WEBRTC_URL=http://127.0.0.1:8555
+    volumes:
+      - ./data:/app/data
+      - ./recordings:/app/recordings
+      - ./snapshots:/app/snapshots
+      - ./config:/app/config
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"

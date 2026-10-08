@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Hệ Thống Giám Sát & Ghi Hình Camera Tập Trung (NVR/VMS Console)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'surface-void': '#07090e',
+            'surface-base': '#0f131c',
+            'surface-dark': '#141a27',
+            'surface-card': '#192132',
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="/style.css?v=1.0.1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-surface-void text-slate-100 antialiased overflow-hidden font-sans">
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+  <!-- Main App Shell -->
+  <div class="flex flex-col h-screen w-screen overflow-hidden">
+    <!-- Top Command Ribbon (Header) -->
+    <header class="h-14 border-b border-white/10 bg-surface-base/90 backdrop-blur-md px-4 flex items-center justify-between z-30 select-none">
+      <!-- Left: Brand & System Telemetry -->
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400 font-bold shadow-glow-sm">
+            <svg class="w-5 h-5" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold tracking-wider text-sm text-slate-100">NVR SECURITY OPS</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono border border-blue-500/30">v1.0.1</span>
+            </div>
+            <div class="flex items-center gap-2 text-[11px] text-slate-400">
+              <span id="gateway-status" class="flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Gateway: Sẵn sàng</span>
+              </span>
+              <span>•</span>
+              <span id="ws-status" class="flex items-center gap-1 text-slate-400">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                <span>WS: Đang kết nối</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Layout Grid Switcher -->
+      <div class="flex items-center bg-surface-dark rounded-lg p-1 border border-white/5 shadow-inner">
+        <button class="grid-btn px-2.5 py-1 text-xs font-medium rounded transition active" data-grid="1x1" title="Xem 1 Camera">1x1</button>
+        <button class="grid-btn px-2.5 py-1 text-xs font-medium rounded transition" data-grid="2x2" title="Lưới 4 Camera">2x2</button>
+        <button class="grid-btn px-2.5 py-1 text-xs font-medium rounded transition" data-grid="3x3" title="Lưới 9 Camera">3x3</button>
+        <button class="grid-btn px-2.5 py-1 text-xs font-medium rounded transition" data-grid="4x4" title="Lưới 16 Camera">4x4</button>
+        <button class="grid-btn px-2.5 py-1 text-xs font-medium rounded transition" data-grid="1+5" title="Chế độ tiêu điểm (1 lớn + 5 nhỏ)">1+5</button>
+      </div>
+
+      <!-- Right: Action Commands & Navigation -->
+      <div class="flex items-center gap-2">
+        <!-- Live AI Alarm Counter Badge -->
+        <button id="btn-toggle-events" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-dark border border-white/10 hover:border-amber-500/50 text-xs font-medium text-slate-200 transition">
+          <svg class="w-4 h-4 text-amber-400" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+          </svg>
+          <span>Sự kiện AI</span>
+          <span id="unread-event-badge" class="px-1.5 py-0.2 rounded-full bg-amber-500 text-black text-[10px] font-bold hidden">0</span>
+        </button>
+
+        <!-- Gallery / Recordings Button -->
+        <button id="btn-open-gallery" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-dark border border-white/10 hover:border-blue-500/50 text-xs font-medium text-slate-200 transition">
+          <svg class="w-4 h-4 text-blue-400" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+          <span>Thư viện Media</span>
+        </button>
+
+        <!-- Manage Accounts & Cameras Button -->
+        <button id="btn-open-devices" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-glow-sm transition">
+          <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          <span>Thêm Thiết bị / Cloud</span>
+        </button>
+
+        <!-- Fullscreen Button -->
+        <button id="btn-fullscreen" class="p-1.5 rounded-lg bg-surface-dark border border-white/10 hover:border-white/30 text-slate-300 transition" title="Toàn màn hình">
+          <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace (Grid Viewport + Collapsible Side Panel) -->
+    <main class="flex-1 flex overflow-hidden relative">
+      <!-- Left/Center: Video Grid Viewport -->
+      <section id="viewport-container" class="flex-1 bg-surface-void p-2 overflow-auto flex flex-col">
+        <div id="camera-grid" class="grid-container grid-1x1 w-full h-full flex-1 gap-2">
+          <!-- Camera Tiles Dynamically Injected Here -->
+        </div>
+      </section>
+
+      <!-- Right Collapsible Panel (Tabs: Cameras / PTZ / Events) -->
+      <aside id="side-panel" class="w-96 border-l border-white/10 bg-surface-base/95 backdrop-blur-md flex flex-col z-20 transition-all duration-300">
+        <!-- Panel Tabs -->
+        <div class="flex border-b border-white/10 bg-surface-dark/50 text-xs font-medium">
+          <button class="panel-tab flex-1 py-2.5 text-center transition border-b-2 border-blue-500 text-blue-400 active" data-tab="tab-cameras">
+            Camera (<span id="count-cameras">0</span>)
+          </button>
+          <button class="panel-tab flex-1 py-2.5 text-center transition border-b-2 border-transparent text-slate-400 hover:text-slate-200" data-tab="tab-ptz">
+            Điều Khiển PTZ
+          </button>
+          <button class="panel-tab flex-1 py-2.5 text-center transition border-b-2 border-transparent text-slate-400 hover:text-slate-200" data-tab="tab-events">
+            Nhật Ký Sự Kiện
+          </button>
+        </div>
+
+        <!-- Tab 1: Cameras Channel List -->
+        <div id="tab-cameras" class="tab-content flex-1 p-3 overflow-y-auto flex flex-col gap-2">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Danh Sách Kênh</span>
+            <button id="btn-sync-all" class="text-[11px] text-blue-400 hover:text-blue-300 flex items-center gap-1 transition">
+              <svg class="w-3 h-3" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              <span>Đồng bộ</span>
+            </button>
+          </div>
+          <div id="camera-channel-list" class="flex flex-col gap-2">
+            <!-- Camera Items Injected Here -->
+          </div>
+        </div>
+
+        <!-- Tab 2: Interactive PTZ Control Deck -->
+        <div id="tab-ptz" class="tab-content flex-1 p-4 overflow-y-auto hidden flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b border-white/5 pb-2">
+            <span class="text-xs font-semibold text-slate-300 uppercase">Mục Tiêu Điều Khiển</span>
+            <span id="ptz-target-name" class="text-xs font-mono text-blue-400 font-semibold truncate max-w-[180px]">Chưa chọn</span>
+          </div>
+
+          <!-- 8-Directional Pad -->
+          <div class="flex flex-col items-center justify-center py-2">
+            <div class="ptz-joystick relative w-48 h-48 rounded-full bg-surface-dark border border-white/10 p-2 flex items-center justify-center shadow-inner">
+              <!-- Up -->
+              <button class="ptz-btn absolute top-2 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-blue-600/30 text-slate-300" data-cmd="up" title="Quay Lên">▲</button>
+              <!-- Down -->
+              <button class="ptz-btn absolute bottom-2 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-blue-600/30 text-slate-300" data-cmd="down" title="Quay Xuống">▼</button>
+              <!-- Left -->
+              <button class="ptz-btn absolute left-2 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-blue-600/30 text-slate-300" data-cmd="left" title="Quay Trái">◀</button>
+              <!-- Right -->
+              <button class="ptz-btn absolute right-2 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-blue-600/30 text-slate-300" data-cmd="right" title="Quay Phải">▶</button>
+              <!-- Center Stop -->
+              <button class="ptz-btn-stop w-12 h-12 rounded-full bg-red-500/20 border border-red-500/40 text-red-400 font-bold text-xs flex items-center justify-center hover:bg-red-500/40 transition" title="Dừng khẩn cấp">STOP</button>
+            </div>
+          </div>
+
+          <!-- Zoom & Speed Controls -->
+          <div class="flex flex-col gap-3 bg-surface-dark/50 p-3 rounded-lg border border-white/5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-slate-300 font-medium">Thu Phóng (Zoom)</span>
+              <div class="flex gap-2">
+                <button class="ptz-btn px-3 py-1 bg-surface-card rounded border border-white/10 hover:bg-blue-600/20 text-xs text-slate-200" data-cmd="zoomin">Zoom In (+)</button>
+                <button class="ptz-btn px-3 py-1 bg-surface-card rounded border border-white/10 hover:bg-blue-600/20 text-xs text-slate-200" data-cmd="zoomout">Zoom Out (-)</button>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between text-xs text-slate-400">
+                <span>Tốc độ quay</span>
+                <span id="ptz-speed-val" class="font-mono text-blue-400">5</span>
+              </div>
+              <input id="ptz-speed-slider" type="range" min="1" max="10" value="5" class="w-full accent-blue-500">
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-500 text-center">
+            * Nhấn giữ để quay, thả chuột để dừng. Tự động ngắt an toàn sau 3s.
+          </div>
+        </div>
+
+        <!-- Tab 3: AI Event Log & Universal Search -->
+        <div id="tab-events" class="tab-content flex-1 p-3 overflow-y-auto hidden flex flex-col gap-3">
+          <!-- Universal Search Input -->
+          <div class="relative">
+            <input id="event-search-input" type="text" placeholder="Tìm kiếm mọi cột (Camera, loại, giờ...)" class="w-full pl-8 pr-3 py-1.5 bg-surface-dark border border-white/10 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-blue-500">
+            <svg class="w-4 h-4 absolute left-2.5 top-2 text-slate-500" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+
+          <!-- Event Type Filter Chips -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+            <button class="event-filter-chip px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40 font-medium active" data-type="all">Tất cả</button>
+            <button class="event-filter-chip px-2.5 py-1 rounded-full bg-surface-dark text-slate-400 border border-white/10 hover:border-amber-500/40 font-medium" data-type="Human">Human</button>
+            <button class="event-filter-chip px-2.5 py-1 rounded-full bg-surface-dark text-slate-400 border border-white/10 hover:border-cyan-500/40 font-medium" data-type="Movement">Movement</button>
+            <button class="event-filter-chip px-2.5 py-1 rounded-full bg-surface-dark text-slate-400 border border-white/10 hover:border-fuchsia-500/40 font-medium" data-type="Abnormal Sound">Sound</button>
+          </div>
+
+          <!-- 3-Mode Export Toolbar (DTCS2 Rule) -->
+          <div class="flex items-center justify-between bg-surface-dark/60 p-2 rounded-lg border border-white/5 text-[11px]">
+            <span class="text-slate-400 font-medium">Xuất dữ liệu:</span>
+            <div class="flex gap-1.5">
+              <button id="btn-export-template" class="px-2 py-0.5 rounded bg-surface-card hover:bg-slate-700 text-slate-300 border border-white/10 transition" title="Chỉ xuất tiêu đề mẫu">Template</button>
+              <button id="btn-export-filtered" class="px-2 py-0.5 rounded bg-surface-card hover:bg-slate-700 text-blue-300 border border-white/10 transition" title="Xuất dữ liệu theo bộ lọc">Bảng Lọc</button>
+              <button id="btn-export-all" class="px-2 py-0.5 rounded bg-blue-600/80 hover:bg-blue-600 text-white font-medium transition" title="Xuất toàn bộ CSDL">Toàn Bộ</button>
+            </div>
+          </div>
+
+          <!-- Live Event Feed Table -->
+          <div class="flex-1 overflow-y-auto border border-white/10 rounded-lg bg-surface-dark/40">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-surface-dark/90 text-slate-400 text-[11px] uppercase tracking-wider sticky top-0 border-b border-white/10">
+                <tr>
+                  <th class="py-2 px-2.5 font-semibold">Thời Gian</th>
+                  <th class="py-2 px-2 font-semibold">Sự Kiện</th>
+                  <th class="py-2 px-2 font-semibold">Camera</th>
+                  <th class="py-2 px-2 font-semibold text-center">Ảnh</th>
+                </tr>
+              </thead>
+              <tbody id="event-table-body" class="divide-y divide-white/5 font-mono">
+                <!-- Event Rows Injected Here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- MODAL: Devices & Cloud Accounts Manager -->
+  <div id="modal-devices" class="modal-backdrop fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-surface-base border border-white/10 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="p-4 border-b border-white/10 flex items-center justify-between">
+        <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
+          <svg class="w-5 h-5 text-blue-400" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          Quản Lý Tài Khoản Cloud & Camera
+        </h2>
+        <button class="modal-close text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+
+      <div class="flex border-b border-white/10 bg-surface-dark/40 text-xs">
+        <button class="modal-tab px-4 py-2.5 font-medium border-b-2 border-blue-500 text-blue-400 active" data-subtab="subtab-ezviz">Tài Khoản EZVIZ</button>
+        <button class="modal-tab px-4 py-2.5 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200" data-subtab="subtab-xiaomi">Tài Khoản Xiaomi</button>
+        <button class="modal-tab px-4 py-2.5 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200" data-subtab="subtab-rtsp">Thêm RTSP / ONVIF</button>
+        <button class="modal-tab px-4 py-2.5 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200" data-subtab="subtab-discover">Quét ONVIF LAN</button>
+      </div>
+
+      <div class="p-4 flex-1 overflow-y-auto">
+        <!-- EZVIZ Form -->
+        <form id="form-ezviz" class="subtab-content flex flex-col gap-3">
+          <div class="text-xs text-slate-400 mb-1">
+            Kết nối đám mây EZVIZ Open Platform để tự động trích xuất luồng video HLS/RTSP và cấp quyền điều khiển PTZ.
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Tên Gợi Nhớ Tài Khoản</label>
+            <input type="text" name="name" required placeholder="Tài khoản EZVIZ Nhà Riêng" class="w-full px-3 py-1.5 bg-surface-dark border border-white/10 rounded-lg text-xs text-slate-200">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">AppKey (hoặc Tài khoản / Email)</label>
+              <input type="text" name="app_key" required placeholder="Nhập AppKey hoặc Username" class="w-full px-3 py-1.5 bg-surface-dark border border-white/10 rounded-lg text-xs text-slate-200 font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">AppSecret (hoặc Mật khẩu)</label>
+              <input type="password" name="app_secret" required placeholder="Nhập Secret Key" class="w-full px-3 py-1.5 bg-surface-dark border border-white/10 rounded-lg text-xs text-slate-200 font-mono">
+            </div>
+          </div>
+          <div class="flex justify-end pt-2">
+            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow-glow-sm">Lưu & Đồng Bộ EZVIZ</button>
+          </div>
+        </form>
+
+        <!-- Xiaomi Form -->
+        <form id="form-xiaomi" class="subtab-content flex flex-col gap-3 hidden">
+          <div class="text-xs text-slate-400 mb-1">
+            Đăng nhập tài khoản Xiaomi Mi Home. Hỗ trợ đầy đủ server Nội địa Trung Quốc (Mainland China) và Quốc tế.
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Tên Gợi Nhớ Tài Khoản</label>
+            <input type="text" name="name" required placeholder="Tài khoản Xiaomi Mi Home" class="w-full px-3 py-1.5 bg-surface-dark border border-white/10 rounded-lg text-xs text-slate-200">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Tên đăng nhập (Email / SĐT / Mi ID)</label>
+              <input type="text" name="username" required placeholder="xiaomi_account@gmail.com" class="w-full px-3 py-1.5 bg-surface-dark border border-white/10 rounded-lg text-xs text-slate-200">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Mật khẩu Xiaomi</label>
+              <input type="password" name="password" required placeholder="••••••••" class="w-full px-3 py-1.5 bg-surface-dark border border-white/10 rounded-lg text-xs text-slate-200">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Phân Vùng Máy Chủ (Server Region)</label>
+            <select name="server_region" class="w-full px-3 py-1.5 bg-surface-dark border border-white/10 rounded-lg text-xs text-slate-200">
+              <option value="cn">Mainland China (Trung Quốc Nội Địa - cn)</option>
+              <option value="sg">Singapore / Đông Nam Á (sg)</option>
+              <option value="us">United States (Bắc Mỹ - us)</option>
+              <option value="de">Germany / Châu Âu (de)</option>
+              <option value="ru">Russia (Nga - ru)</option>
+              <option value="i2">India (Ấn Độ - i2)</option>
+            </select>
+          </div>
+          <div class="flex justify-end pt-2">
+            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow-glow-sm">Lưu & Đồng Bộ Xiaomi</button>
+          </div>
+        </form>
+
+        <!-- RTSP / ONVIF Form -->
+        <form id="form-rtsp" class="subtab-content flex flex-col gap-3 hidden">
+          <div class="text-xs text-slate-400 mb-1">
+            Thêm thủ công camera IP qua luồng RTSP chuẩn hoặc ONVIF (Hikvision, Dahua, Imou, Yoosee, v.v.).
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Tên Camera</label>
+              <input type="text" name="name" required placeholder="Camera Sân Vườn" class="w-full px-3 py-1.5 bg-surface-dark border border-white/10 rounded-lg text-xs text-slate-200">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Hãng / Nhà sản xuất</label>
+              <input type="text" name="vendor" value="generic" placeholder="Hikvision, Dahua, v.v." class="w-full px-3 py-1.5 bg-surface-dark border border-white/10 rounded-lg text-xs text-slate-200">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Luồng Chính (Mainstream RTSP URL)</label>
+            <input type="text" name="mainstream_url" required placeholder="rtsp://admin:pass@192.168.1.100:554/live/ch0" class="w-full px-3 py-1.5 bg-surface-dark border border-white/10 rounded-lg text-xs text-slate-200 font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Luồng Phụ (Substream URL - Không bắt buộc)</label>
+            <input type="text" name="substream_url" placeholder="rtsp://admin:pass@192.168.1.100:554/live/ch1" class="w-full px-3 py-1.5 bg-surface-dark border border-white/10 rounded-lg text-xs text-slate-200 font-mono">
+          </div>
+          <div class="flex justify-end pt-2">
+            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow-glow-sm">Thêm Camera</button>
+          </div>
+        </form>
+
+        <!-- Discover ONVIF Panel -->
+        <div id="subtab-discover" class="subtab-content flex flex-col gap-3 hidden">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-400">Tự động phát hiện camera ONVIF qua UDP Multicast trên mạng LAN nội bộ.</span>
+            <button id="btn-run-discover" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-glow-sm flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <span>Bắt Đầu Quét</span>
+            </button>
+          </div>
+          <div id="discovered-list" class="border border-white/10 rounded-lg bg-surface-dark/40 min-h-[160px] p-3 text-xs flex flex-col gap-2">
+            <div class="text-slate-500 italic text-center py-8">Nhấn "Bắt Đầu Quét" để tìm camera ONVIF trong mạng nội bộ.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Gallery & Recordings -->
+  <div id="modal-gallery" class="modal-backdrop fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-surface-base border border-white/10 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="p-4 border-b border-white/10 flex items-center justify-between">
+        <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
+          <svg class="w-5 h-5 text-blue-400" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+          </svg>
+          Thư Viện Ghi Hình & Ảnh Chụp
+        </h2>
+        <button class="modal-close text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+      <div class="p-4 flex-1 overflow-y-auto">
+        <div id="gallery-grid" class="grid grid-cols-3 gap-3">
+          <!-- Gallery Items Injected Here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Snapshot Lightbox -->
+  <div id="modal-lightbox" class="fixed inset-0 bg-black/90 z-60 flex items-center justify-center p-4 hidden" onclick="this.classList.add('hidden')">
+    <div class="relative max-w-5xl max-h-[90vh] flex flex-col items-center">
+      <img id="lightbox-img" src="" alt="Snapshot Preview" class="max-w-full max-h-[85vh] rounded-lg border border-white/20 shadow-2xl object-contain">
+      <div id="lightbox-caption" class="text-xs text-slate-300 mt-2 font-mono"></div>
+    </div>
+  </div>
+
+  <script src="/app.js?v=1.0.1"></script>
+</body>
+</html>

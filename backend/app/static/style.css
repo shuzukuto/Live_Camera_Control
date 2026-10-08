@@ -1,0 +1,702 @@
+/* ==========================================================================
+   Surveillance Operations Center (NVR/VMS Console) - CSS Theme
+   Standards: UI/UX Pro Max, Glassmorphism, 100% Self-Contained Stylesheet
+   App Version: v1.0.1
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Design System Tokens & Color Variables
+   -------------------------------------------------------------------------- */
+:root {
+  --surface-void: #07090e;
+  --surface-base: #0f131c;
+  --surface-dark: #141a27;
+  --surface-card: #192132;
+  --surface-hover: #222c42;
+  --glass-bg: rgba(18, 24, 38, 0.85);
+  --border-hairline: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.12);
+  --border-focus: rgba(59, 130, 246, 0.6);
+  --accent-blue: #3b82f6;
+  --accent-blue-hover: #2563eb;
+  --live-green: #10b981;
+  --rec-red: #ef4444;
+  --human-amber: #f59e0b;
+  --motion-cyan: #06b6d4;
+  --sound-fuchsia: #d946ef;
+}
+
+/* --------------------------------------------------------------------------
+   2. Reset & Global Base
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--surface-void);
+  color: #f1f5f9;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --------------------------------------------------------------------------
+   3. Strict SVG & Icon Sizing Protection (Prevents Giant Icon Layout Distortion)
+   -------------------------------------------------------------------------- */
+svg {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Hardened icon dimensions */
+svg.w-3, .w-3 { width: 0.75rem !important; height: 0.75rem !important; }
+svg.w-3\.5, .w-3\.5 { width: 0.875rem !important; height: 0.875rem !important; }
+svg.w-4, .w-4 { width: 1rem !important; height: 1rem !important; }
+svg.w-5, .w-5 { width: 1.25rem !important; height: 1.25rem !important; }
+svg.w-6, .w-6 { width: 1.5rem !important; height: 1.5rem !important; }
+svg.w-8, .w-8 { width: 2rem !important; height: 2rem !important; }
+svg.w-9, .w-9 { width: 2.25rem !important; height: 2.25rem !important; }
+svg.w-10, .w-10 { width: 2.5rem !important; height: 2.5rem !important; }
+svg.w-12, .w-12 { width: 3rem !important; height: 3rem !important; }
+
+svg.h-3, .h-3 { height: 0.75rem !important; }
+svg.h-3\.5, .h-3\.5 { height: 0.875rem !important; }
+svg.h-4, .h-4 { height: 1rem !important; }
+svg.h-5, .h-5 { height: 1.25rem !important; }
+svg.h-6, .h-6 { height: 1.5rem !important; }
+svg.h-8, .h-8 { height: 2rem !important; }
+svg.h-9, .h-9 { height: 2.25rem !important; }
+svg.h-10, .h-10 { height: 2.5rem !important; }
+svg.h-12, .h-12 { height: 3rem !important; }
+
+.w-1\.5 { width: 0.375rem !important; }
+.h-1\.5 { height: 0.375rem !important; }
+.w-2 { width: 0.5rem !important; }
+.h-2 { height: 0.5rem !important; }
+.w-48 { width: 12rem !important; }
+.h-48 { height: 12rem !important; }
+.w-96 { width: 24rem !important; }
+.w-full { width: 100% !important; }
+.h-full { height: 100% !important; }
+.h-14 { height: 3.5rem !important; }
+.w-screen { width: 100vw !important; }
+.h-screen { height: 100vh !important; }
+
+.max-w-md { max-width: 28rem !important; }
+.max-w-2xl { max-width: 42rem !important; }
+.max-w-4xl { max-width: 56rem !important; }
+.max-w-5xl { max-width: 64rem !important; }
+.max-w-\[140px\] { max-width: 140px !important; }
+.max-w-\[180px\] { max-width: 180px !important; }
+.max-h-\[90vh\] { max-height: 90vh !important; }
+.max-h-\[85vh\] { max-height: 85vh !important; }
+.min-h-\[160px\] { min-height: 160px !important; }
+
+/* --------------------------------------------------------------------------
+   4. Flexbox & Grid System
+   -------------------------------------------------------------------------- */
+.flex { display: flex !important; }
+.inline-flex { display: inline-flex !important; }
+.flex-col { flex-direction: column !important; }
+.flex-row { flex-direction: row !important; }
+.flex-1 { flex: 1 1 0% !important; }
+.shrink-0 { flex-shrink: 0 !important; }
+
+.items-center { align-items: center !important; }
+.items-start { align-items: flex-start !important; }
+.items-end { align-items: flex-end !important; }
+
+.justify-between { justify-content: space-between !important; }
+.justify-center { justify-content: center !important; }
+.justify-end { justify-content: flex-end !important; }
+.justify-start { justify-content: flex-start !important; }
+
+.grid { display: grid !important; }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+
+.gap-1 { gap: 0.25rem !important; }
+.gap-1\.5 { gap: 0.375rem !important; }
+.gap-2 { gap: 0.5rem !important; }
+.gap-2\.5 { gap: 0.625rem !important; }
+.gap-3 { gap: 0.75rem !important; }
+.gap-4 { gap: 1rem !important; }
+.gap-6 { gap: 1.5rem !important; }
+
+/* --------------------------------------------------------------------------
+   5. Positioning, Display & Visibility
+   -------------------------------------------------------------------------- */
+.hidden { display: none !important; }
+.relative { position: relative !important; }
+.absolute { position: absolute !important; }
+.fixed { position: fixed !important; }
+.sticky { position: sticky !important; }
+
+.inset-0 { top: 0 !important; right: 0 !important; bottom: 0 !important; left: 0 !important; }
+.top-0 { top: 0 !important; }
+.top-2 { top: 0.5rem !important; }
+.top-5 { top: 1.25rem !important; }
+.bottom-2 { bottom: 0.5rem !important; }
+.left-2 { left: 0.5rem !important; }
+.left-2\.5 { left: 0.625rem !important; }
+.right-2 { right: 0.5rem !important; }
+.right-5 { right: 1.25rem !important; }
+
+.z-10 { z-index: 10 !important; }
+.z-20 { z-index: 20 !important; }
+.z-30 { z-index: 30 !important; }
+.z-50 { z-index: 50 !important; }
+.z-60 { z-index: 60 !important; }
+
+.pointer-events-none { pointer-events: none !important; }
+.pointer-events-auto { pointer-events: auto !important; }
+.select-none { user-select: none !important; }
+
+/* --------------------------------------------------------------------------
+   6. Spacing (Padding & Margin)
+   -------------------------------------------------------------------------- */
+.p-1 { padding: 0.25rem !important; }
+.p-1\.5 { padding: 0.375rem !important; }
+.p-2 { padding: 0.5rem !important; }
+.p-2\.5 { padding: 0.625rem !important; }
+.p-3 { padding: 0.75rem !important; }
+.p-4 { padding: 1rem !important; }
+
+.px-1 { padding-left: 0.25rem !important; padding-right: 0.25rem !important; }
+.px-1\.5 { padding-left: 0.375rem !important; padding-right: 0.375rem !important; }
+.px-2 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+.px-2\.5 { padding-left: 0.625rem !important; padding-right: 0.625rem !important; }
+.px-3 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+.px-4 { padding-left: 1rem !important; padding-right: 1rem !important; }
+
+.py-0\.2, .py-0\.5 { padding-top: 0.125rem !important; padding-bottom: 0.125rem !important; }
+.py-1 { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
+.py-1\.5 { padding-top: 0.375rem !important; padding-bottom: 0.375rem !important; }
+.py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+.py-2\.5 { padding-top: 0.625rem !important; padding-bottom: 0.625rem !important; }
+.py-6 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+.py-8 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+
+.pt-2 { padding-top: 0.5rem !important; }
+.pb-1 { padding-bottom: 0.25rem !important; }
+.pb-2 { padding-bottom: 0.5rem !important; }
+.pl-8 { padding-left: 2rem !important; }
+.pr-3 { padding-right: 0.75rem !important; }
+
+.m-0 { margin: 0 !important; }
+.mt-0\.5 { margin-top: 0.125rem !important; }
+.mt-1 { margin-top: 0.25rem !important; }
+.mt-2 { margin-top: 0.5rem !important; }
+.mb-1 { margin-bottom: 0.25rem !important; }
+.mb-2 { margin-bottom: 0.5rem !important; }
+.ml-1 { margin-left: 0.25rem !important; }
+
+/* --------------------------------------------------------------------------
+   7. Typography & Fonts
+   -------------------------------------------------------------------------- */
+.text-\[10px\] { font-size: 10px !important; line-height: 14px !important; }
+.text-\[11px\] { font-size: 11px !important; line-height: 15px !important; }
+.text-xs { font-size: 0.75rem !important; line-height: 1rem !important; }
+.text-sm { font-size: 0.875rem !important; line-height: 1.25rem !important; }
+.text-base { font-size: 1rem !important; line-height: 1.5rem !important; }
+.text-lg { font-size: 1.125rem !important; line-height: 1.75rem !important; }
+
+.font-sans { font-family: 'Inter', system-ui, sans-serif !important; }
+.font-mono { font-family: 'JetBrains Mono', Consolas, Monaco, monospace !important; }
+.font-medium { font-weight: 500 !important; }
+.font-semibold { font-weight: 600 !important; }
+.font-bold { font-weight: 700 !important; }
+
+.tracking-wider { letter-spacing: 0.05em !important; }
+.uppercase { text-transform: uppercase !important; }
+.italic { font-style: italic !important; }
+.text-center { text-align: center !important; }
+.text-left { text-align: left !important; }
+.text-right { text-align: right !important; }
+.truncate {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* --------------------------------------------------------------------------
+   8. Color System & Backgrounds
+   -------------------------------------------------------------------------- */
+.bg-surface-void { background-color: var(--surface-void) !important; }
+.bg-surface-base { background-color: var(--surface-base) !important; }
+.bg-surface-base\/90 { background-color: rgba(15, 19, 28, 0.9) !important; }
+.bg-surface-base\/95 { background-color: rgba(15, 19, 28, 0.95) !important; }
+.bg-surface-dark { background-color: var(--surface-dark) !important; }
+.bg-surface-dark\/40 { background-color: rgba(20, 26, 39, 0.4) !important; }
+.bg-surface-dark\/50 { background-color: rgba(20, 26, 39, 0.5) !important; }
+.bg-surface-dark\/60 { background-color: rgba(20, 26, 39, 0.6) !important; }
+.bg-surface-dark\/90 { background-color: rgba(20, 26, 39, 0.9) !important; }
+.bg-surface-card { background-color: var(--surface-card) !important; }
+
+.bg-blue-600 { background-color: #2563eb !important; }
+.bg-blue-600:hover, .hover\:bg-blue-500:hover { background-color: #3b82f6 !important; }
+.bg-blue-500\/20 { background-color: rgba(59, 130, 246, 0.2) !important; }
+.bg-blue-600\/20 { background-color: rgba(37, 99, 235, 0.2) !important; }
+.bg-blue-600\/80 { background-color: rgba(37, 99, 235, 0.8) !important; }
+.bg-emerald-500 { background-color: #10b981 !important; }
+.bg-emerald-500\/20 { background-color: rgba(16, 185, 129, 0.2) !important; }
+.bg-red-500 { background-color: #ef4444 !important; }
+.bg-red-500\/20 { background-color: rgba(239, 68, 68, 0.2) !important; }
+.bg-red-600 { background-color: #dc2626 !important; }
+.bg-amber-500 { background-color: #f59e0b !important; }
+.bg-black\/70 { background-color: rgba(0, 0, 0, 0.7) !important; }
+.bg-black\/90 { background-color: rgba(0, 0, 0, 0.9) !important; }
+.bg-white { background-color: #ffffff !important; }
+
+.text-white { color: #ffffff !important; }
+.text-black { color: #000000 !important; }
+.text-slate-100 { color: #f1f5f9 !important; }
+.text-slate-200 { color: #e2e8f0 !important; }
+.text-slate-300 { color: #cbd5e1 !important; }
+.text-slate-400 { color: #94a3b8 !important; }
+.text-slate-500 { color: #64748b !important; }
+.text-slate-600 { color: #475569 !important; }
+.text-blue-300 { color: #93c5fd !important; }
+.text-blue-400 { color: #60a5fa !important; }
+.hover\:text-blue-300:hover { color: #93c5fd !important; }
+.hover\:text-blue-400:hover { color: #60a5fa !important; }
+.hover\:text-slate-200:hover { color: #e2e8f0 !important; }
+.hover\:text-white:hover { color: #ffffff !important; }
+
+.text-amber-400 { color: #fbbf24 !important; }
+.text-cyan-400 { color: #22d3ee !important; }
+.text-fuchsia-400 { color: #e879f9 !important; }
+.text-emerald-400 { color: #34d399 !important; }
+.text-red-400 { color: #f87171 !important; }
+.text-yellow-400 { color: #facc15 !important; }
+
+/* --------------------------------------------------------------------------
+   9. Borders, Radius & Dividers
+   -------------------------------------------------------------------------- */
+.border { border-width: 1px !important; border-style: solid !important; }
+.border-b { border-bottom-width: 1px !important; border-bottom-style: solid !important; }
+.border-t { border-top-width: 1px !important; border-top-style: solid !important; }
+.border-l { border-left-width: 1px !important; border-left-style: solid !important; }
+.border-r { border-right-width: 1px !important; border-right-style: solid !important; }
+.border-b-2 { border-bottom-width: 2px !important; border-bottom-style: solid !important; }
+.border-transparent { border-color: transparent !important; }
+
+.border-white\/5 { border-color: rgba(255, 255, 255, 0.05) !important; }
+.border-white\/10 { border-color: rgba(255, 255, 255, 0.1) !important; }
+.border-white\/20 { border-color: rgba(255, 255, 255, 0.2) !important; }
+.border-blue-500 { border-color: #3b82f6 !important; }
+.border-blue-500\/30 { border-color: rgba(59, 130, 246, 0.3) !important; }
+.border-blue-500\/40 { border-color: rgba(59, 130, 246, 0.4) !important; }
+.border-blue-500\/60 { border-color: rgba(59, 130, 246, 0.6) !important; }
+.border-emerald-500\/30 { border-color: rgba(16, 185, 129, 0.3) !important; }
+.border-red-500\/40 { border-color: rgba(239, 68, 68, 0.4) !important; }
+.border-amber-500\/40 { border-color: rgba(245, 158, 11, 0.4) !important; }
+.border-cyan-500\/40 { border-color: rgba(6, 182, 212, 0.4) !important; }
+.border-fuchsia-500\/40 { border-color: rgba(217, 70, 239, 0.4) !important; }
+
+.rounded { border-radius: 0.25rem !important; }
+.rounded-md { border-radius: 0.375rem !important; }
+.rounded-lg { border-radius: 0.5rem !important; }
+.rounded-xl { border-radius: 0.75rem !important; }
+.rounded-full { border-radius: 9999px !important; }
+
+.divide-y > * + * {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* --------------------------------------------------------------------------
+   10. Glassmorphism, Shadows & Visual Effects
+   -------------------------------------------------------------------------- */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+.backdrop-blur-md {
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+.shadow-inner {
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6) !important;
+}
+
+.shadow-glow-sm {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.25) !important;
+}
+
+.shadow-glow-rec {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4) !important;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+}
+
+/* --------------------------------------------------------------------------
+   11. Scrollbars
+   -------------------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.overflow-hidden { overflow: hidden !important; }
+.overflow-auto { overflow: auto !important; }
+.overflow-y-auto { overflow-y: auto !important; }
+.overflow-x-auto { overflow-x: auto !important; }
+
+/* --------------------------------------------------------------------------
+   12. Buttons & Interactivity
+   -------------------------------------------------------------------------- */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  transition: all 0.15s ease-in-out;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+.grid-btn {
+  color: #94a3b8;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.grid-btn:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+.grid-btn.active {
+  color: #ffffff;
+  background-color: #2563eb;
+  border-color: #3b82f6;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   13. Camera Grid Layouts & Slots
+   -------------------------------------------------------------------------- */
+.grid-container {
+  display: grid;
+  height: 100%;
+  width: 100%;
+}
+
+.grid-1x1 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+.grid-2x2 {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.grid-3x3 {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.grid-4x4 {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
+.grid-1\+5 {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+}
+.grid-1\+5 .camera-tile:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+/* --------------------------------------------------------------------------
+   14. Camera Tile Component
+   -------------------------------------------------------------------------- */
+.camera-tile {
+  background-color: var(--surface-dark);
+  border: 1px solid var(--border-hairline);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.camera-tile.selected {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+
+.camera-tile.recording {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.25);
+}
+
+.camera-tile video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: #000000;
+}
+
+.tile-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, rgba(7, 9, 14, 0.85) 0%, rgba(7, 9, 14, 0) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.tile-header > * {
+  pointer-events: auto;
+}
+
+.tile-osd {
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 11px;
+  color: #94a3b8;
+  background: rgba(7, 9, 14, 0.7);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.tile-actions {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 19, 28, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 10;
+}
+
+.camera-tile:hover .tile-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tile-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tile-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.tile-btn.btn-rec.active {
+  background-color: var(--rec-red);
+  color: #ffffff;
+  border-color: #f87171;
+  animation: pulse-rec 2s infinite;
+}
+
+@keyframes pulse-rec {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* --------------------------------------------------------------------------
+   15. PTZ Joystick Deck
+   -------------------------------------------------------------------------- */
+.ptz-joystick {
+  position: relative;
+  width: 12rem !important;
+  height: 12rem !important;
+  border-radius: 9999px;
+  background-color: var(--surface-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.ptz-btn {
+  background-color: var(--surface-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.1s, background-color 0.15s;
+  user-select: none;
+  cursor: pointer;
+}
+.ptz-btn:active {
+  transform: scale(0.92);
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+.ptz-btn-stop {
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.1s, background-color 0.15s;
+}
+.ptz-btn-stop:active {
+  transform: scale(0.92);
+  background-color: rgba(239, 68, 68, 0.6) !important;
+}
+
+/* --------------------------------------------------------------------------
+   16. Forms, Inputs & Range Slider
+   -------------------------------------------------------------------------- */
+input[type="text"], input[type="password"], select {
+  font-family: inherit;
+  font-size: 0.75rem;
+  color: #f1f5f9;
+  outline: none;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+input[type="text"]:focus, input[type="password"]:focus, select:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25) !important;
+}
+
+input[type="range"] {
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   17. Event Filter Chips & Tables
+   -------------------------------------------------------------------------- */
+.event-filter-chip {
+  transition: all 0.15s;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.event-filter-chip.active {
+  background-color: rgba(59, 130, 246, 0.25) !important;
+  border-color: #3b82f6 !important;
+  color: #60a5fa !important;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   18. Toast Notifications
+   -------------------------------------------------------------------------- */
+.toast-item {
+  background: rgba(18, 24, 38, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 300px;
+  max-width: 400px;
+  pointer-events: auto;
+  animation: toast-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+@keyframes toast-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   19. Modal Dialogs & Lightbox
+   -------------------------------------------------------------------------- */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 50;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-backdrop:not(.hidden) {
+  display: flex !important;
+}
+
+#modal-lightbox:not(.hidden) {
+  display: flex !important;
+}

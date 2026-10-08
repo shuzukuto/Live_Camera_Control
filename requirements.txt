@@ -1,0 +1,37 @@
+# ==============================================================================
+# Web NVR/VMS Application - Production Dependencies
+# Target Runtimes: Python 3.10 - 3.14 (Win64 / Linux x86_64 & aarch64)
+# ==============================================================================
+
+# Core Web Framework & ASGI Server
+fastapi>=0.136.0,<1.0.0
+uvicorn[standard]>=0.48.0,<1.0.0
+starlette>=0.45.0,<1.0.0
+
+# Settings, Validation & Schemas
+pydantic>=2.10.0,<3.0.0
+pydantic-settings>=2.7.0,<3.0.0
+python-dotenv>=1.0.0,<2.0.0
+
+# Security, Cryptography & Rate Limiting
+cryptography>=43.0.0,<51.0.0
+bcrypt>=4.0.0,<6.0.0
+slowapi>=0.1.9,<0.2.0
+limits>=3.0.0,<6.0.0
+
+# Asynchronous Database & I/O
+aiosqlite>=0.20.0,<0.23.0
+httpx>=0.27.0,<1.0.0
+websockets>=13.0,<18.0
+
+# Bundled Media & Image Processing
+imageio-ffmpeg>=0.5.0,<1.0.0
+Pillow>=10.0.0,<13.0.0
+
+# Reporting, Metrics & System Telemetry
+openpyxl>=3.1.2,<4.0.0
+psutil>=5.9.0,<8.0.0
+
+# Testing & Quality Assurance (Development)
+pytest>=8.0.0,<10.0.0
+pytest-asyncio>=0.23.0,<2.0.0

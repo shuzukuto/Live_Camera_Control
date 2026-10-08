@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Pytest / Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Binaries & Media Server Executables (auto-downloaded at runtime)
+bin/*
+!bin/.gitkeep
+
+# Runtime Databases, Encryption Secrets & Media Storage
+data/*
+!data/.gitkeep
+recordings/*
+!recordings/.gitkeep
+snapshots/*
+!snapshots/.gitkeep
+
+# Environment variables & local secrets
+.env
+.env.local
+
+# IDE / Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Agent metadata
+.agents/
